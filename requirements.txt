@@ -1,0 +1,5 @@
+discord.py
+pytz
+openpyxl
+requests
+beautifulsoup4
