@@ -35,6 +35,10 @@ async def on_message(message):
     author = message.author
     content = message.content
 
+    role_jungwaja = discord.utils.get(message.server.roles, name="전과자")
+    role_nochat = discord.utils.get(message.server.roles, name="채팅금지(공지확인)")
+    role_baebung = discord.utils.get(message.server.roles, name="배붕이")
+
     # print('{}: {}'.format(author, content))
 
     # if message.content.startswith("$신고함채널설정"):
@@ -45,7 +49,7 @@ async def on_message(message):
     #     await client.send_message(contact_channel, message.content)
 
     # 건의함 기능
-    contact_channel = client.get_channel('454528355778428941')
+    contact_channel = client.get_channel('446335093254914050')
     if message.server is None and message.author.id != '480847872074448906':
         embed_contactus = discord.Embed(title="닉네임 : " + str(message.author), description= message.content, color=0x1895a7)
         if message.attachments:
@@ -205,96 +209,93 @@ async def on_message(message):
     bypass_list = ['415535047203094541']
     contents = message.content.split(" ")
 
-    if client.servers == 291849424953409536:
-        role_jungwaja = discord.utils.get(message.server.roles, name="전과자")
-        role_nochat = discord.utils.get(message.server.roles, name="채팅금지(공지확인)")
-        role_baebung = discord.utils.get(message.server.roles, name="배붕이")
-        for word in contents:
-            if "502065016393039873" in [role.id for role in message.author.roles]:
+    #if client.servers == 291849424953409536:
+    for word in contents:
+        if "502065016393039873" in [role.id for role in message.author.roles]:
+            out_d = now.day + 1
+            out_h = now.hour
+        else:
+            if now.hour >= 12:
                 out_d = now.day + 1
-                out_h = now.hour
+                out_h = now.hour - 12
             else:
-                if now.hour >= 12:
-                    out_d = now.day + 1
-                    out_h = now.hour - 12
-                else:
-                    out_d = now.day
-                    out_h = now.hour + 12
-            if "309912507257061388" in [role.id for role in message.author.roles]:
-                split_name = author.display_name.split(" ")
-                out_d_chk = split_name[1].split("일")
-                if out_d_chk[0].isdigit():
-                    out_d = int(out_d_chk[0]) + 1
-
-
-                # if now.month in [1, 3, 5, 7, 8, 10, 12]:
-                #     if int(out_d_chk[0]) > 31:
-                #         out_d = 1
-                # elif now.month in [4, 6, 9, 11]:
-                #     if int(out_d_chk[0]) > 30:
-                #         out_d = 1
-                # elif now.month == 2:
-                #     if int(out_d_chk[0]) > 28:
-                #         out_d = 1
-
-            if not author.id in bypass_list:
-                if word in chat_filter_ilbe or word in chat_filter_megal:
-                    if word in chat_filter_ilbe:
-                        await client.send_message(message.channel, "삐빅, 일베충 검출")
-                        await client.change_nickname(author, "일베충 " + str(out_d) + "일 " + str(out_h) + "시 " + str(now.minute) + "분 해제")
-                    if word in chat_filter_megal:
-                        await client.send_message(message.channel, "삐빅, 메갈 검출")
-                        await client.change_nickname(author, "메갈 " + str(out_d) + "일 " + str(out_h) + "시 " + str(now.minute) + "분 해제")
-                    try:
-                        await client.remove_roles(author, role_baebung)
-                        await asyncio.sleep(0.5)
-                    except discord.Forbidden:
-                        await client.send_message(message.channel, "권한이 없음")
-                    try:
-                        await client.add_roles(author, role_jungwaja)
-                        await asyncio.sleep(0.5)
-                    except discord.Forbidden:
-                        await client.send_message(message.channel, "권한이 없음")
-                    try:
-                        await client.add_roles(author, role_nochat)
-                        await asyncio.sleep(0.5)
-                    except discord.Forbidden:
-                        await client.send_message(message.channel, "권한이 없음")
-
-        if message.content.startswith('$해제'):
+                out_d = now.day
+                out_h = now.hour + 12
+        if "309912507257061388" in [role.id for role in message.author.roles]:
             split_name = author.display_name.split(" ")
             out_d_chk = split_name[1].split("일")
-            out_h_chk = split_name[2].split("시")
-            out_m_chk = split_name[3].split("분")
-            now_time = now.day * 1440 + now.hour * 60 + now.minute
-            if out_m_chk[0].isdigit():
-                out_time = int(out_d_chk[0]) * 1440 + int(out_h_chk[0]) * 60 + int(out_m_chk[0])
-            else:
-                out_time = int(out_d_chk[0]) * 1440 + int(out_h_chk[0]) * 60
+            if out_d_chk[0].isdigit():
+                out_d = int(out_d_chk[0]) + 1
 
-            if out_time <= now_time:
-                if out_m_chk[0].isdigit():
-                    await client.send_message(message.channel, "나갈시간 : " + str(out_d_chk[0]) + "일 " + str(out_h_chk[0]) + "시 " + str(out_m_chk[0]) + "분, 현재시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
-                else:
-                    await client.send_message(message.channel, "나갈시간 : " + str(out_d_chk[0]) + "일 " + str(out_h_chk[0]) + "시, 현재 시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
-                await client.send_message(message.channel, "나갈시간 됐다")
+
+            # if now.month in [1, 3, 5, 7, 8, 10, 12]:
+            #     if int(out_d_chk[0]) > 31:
+            #         out_d = 1
+            # elif now.month in [4, 6, 9, 11]:
+            #     if int(out_d_chk[0]) > 30:
+            #         out_d = 1
+            # elif now.month == 2:
+            #     if int(out_d_chk[0]) > 28:
+            #         out_d = 1
+
+        if not author.id in bypass_list:
+            if word in chat_filter_ilbe or word in chat_filter_megal:
+                if word in chat_filter_ilbe:
+                    await client.send_message(message.channel, "삐빅, 일베충 검출")
+                    await client.change_nickname(author, "일베충 " + str(out_d) + "일 " + str(out_h) + "시 " + str(now.minute) + "분 해제")
+                if word in chat_filter_megal:
+                    await client.send_message(message.channel, "삐빅, 메갈 검출")
+                    await client.change_nickname(author, "메갈 " + str(out_d) + "일 " + str(out_h) + "시 " + str(now.minute) + "분 해제")
                 try:
-                    await client.remove_roles(author, role_nochat)
-                    await client.change_nickname(author, "")
-                    await asyncio.sleep(0.5)
-                except discord.Forbidden:
-                    await client.send_message(author, "권한이 없음")
-                try:
-                    await client.add_roles(author, role_baebung)
+                    await client.remove_roles(author, role_baebung)
                     await asyncio.sleep(0.5)
                 except discord.Forbidden:
                     await client.send_message(message.channel, "권한이 없음")
+                try:
+                    await client.add_roles(author, role_jungwaja)
+                    await asyncio.sleep(0.5)
+                except discord.Forbidden:
+                    await client.send_message(message.channel, "권한이 없음")
+                try:
+                    await client.add_roles(author, role_nochat)
+                    await asyncio.sleep(0.5)
+                except discord.Forbidden:
+                    await client.send_message(message.channel, "권한이 없음")
+
+    if message.content.startswith('$해제'):
+        split_name = author.display_name.split(" ")
+        out_d_chk = split_name[1].split("일")
+        out_h_chk = split_name[2].split("시")
+        out_m_chk = split_name[3].split("분")
+        now_time = now.day * 1440 + now.hour * 60 + now.minute
+        if out_m_chk[0].isdigit():
+            out_time = int(out_d_chk[0]) * 1440 + int(out_h_chk[0]) * 60 + int(out_m_chk[0])
+        else:
+            out_time = int(out_d_chk[0]) * 1440 + int(out_h_chk[0]) * 60
+
+        if out_time <= now_time:
+            if out_m_chk[0].isdigit():
+                await client.send_message(message.channel, "나갈시간 : " + str(out_d_chk[0]) + "일 " + str(out_h_chk[0]) + "시 " + str(out_m_chk[0]) + "분, 현재시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
             else:
-                if out_m_chk[0].isdigit():
-                    await client.send_message(message.channel, "나갈시간 : " + str(out_d_chk[0]) + "일 " + str(out_h_chk[0]) + "시 " + str(out_m_chk[0]) + "분, 현재시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
-                else:
-                    await client.send_message(message.channel, "나갈시간 : " + str(out_d_chk[0]) + "일 " + str(out_h_chk[0]) + "시, 현재 시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
-                await client.send_message(message.channel, "나갈시간 아직이다")
+                await client.send_message(message.channel, "나갈시간 : " + str(out_d_chk[0]) + "일 " + str(out_h_chk[0]) + "시, 현재 시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
+            await client.send_message(message.channel, "나갈시간 됐다")
+            try:
+                await client.remove_roles(author, role_nochat)
+                await client.change_nickname(author, "")
+                await asyncio.sleep(0.5)
+            except discord.Forbidden:
+                await client.send_message(author, "권한이 없음")
+            try:
+                await client.add_roles(author, role_baebung)
+                await asyncio.sleep(0.5)
+            except discord.Forbidden:
+                await client.send_message(message.channel, "권한이 없음")
+        else:
+            if out_m_chk[0].isdigit():
+                await client.send_message(message.channel, "나갈시간 : " + str(out_d_chk[0]) + "일 " + str(out_h_chk[0]) + "시 " + str(out_m_chk[0]) + "분, 현재시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
+            else:
+                await client.send_message(message.channel, "나갈시간 : " + str(out_d_chk[0]) + "일 " + str(out_h_chk[0]) + "시, 현재 시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
+            await client.send_message(message.channel, "나갈시간 아직이다")
 
 '''
     if "test" in message.content:
