@@ -332,9 +332,11 @@ async def on_message_delete(message):
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-# f = open('./TOKEN.txt', 'r')
-# TOKEN = f.read()
-# f.close()
+# access_token = os.inviron("BOT_TOKEN")
+# client.run(access_token)
 
-access_token = os.inviron("BOT_TOKEN")
-client.run(access_token)
+f = open('./TOKEN.txt', 'r')
+TOKEN = f.read()
+f.close()
+
+client.run(TOKEN)
