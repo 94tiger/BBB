@@ -13,7 +13,11 @@ def get_html(url):
     return _html
 
 def get_gegle(gallery):
-    URL = ("https://gall.dcinside.com/board/lists?id=" + str(gallery) + "&exception_mode=recommend")
+    if str(gallery) == "issuezoom" or str(gallery) == "hit":
+        URL = ("https://gall.dcinside.com/board/lists?id=" + str(gallery))
+    else:
+        URL = ("https://gall.dcinside.com/board/lists?id=" + str(gallery) + "&exception_mode=recommend")
+
     # URL = "https://gall.dcinside.com/board/lists?id=baseball_new7&exception_mode=recommend"
     html = get_html(URL)
     soup = BeautifulSoup(html, 'html.parser')

@@ -3,6 +3,7 @@
 import discord
 from discord.ext import commands
 import os
+import re
 from pytz import timezone
 from datetime import datetime
 import asyncio
@@ -11,6 +12,7 @@ import openpyxl
 import image
 import bg
 import gegle
+import _token
 
 client = discord.Client()
 
@@ -117,9 +119,10 @@ async def on_message(message):
         if gallery_name == "중갤":
             gallery_str = "aoegame"
             gegl = gegle.get_mgegle(gallery_str)
-
+        if gallery_name == "이슈줌":
+            gallery_str = "issuezoom"
+            gegl = gegle.get_gegle(gallery_str)
         # gegl = gegle.get_gegle(gallery_str)
-
         gegl_value = ""
         for i in range(len(gegl)):
             gegl_value = gegl_value + str(i+1) + ". [" + gegl[i][0] + " " + gegl[i][1] + "](" + gegl[i][2] + ") \n"
@@ -374,21 +377,25 @@ async def on_message(message):
                         out_h_chk[0]) + "시, 현재 시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
                 await client.send_message(message.channel, "나갈시간 아직이다")
 
-'''
-@client.event
-async def on_message_delete(message):
-    author = message.author
-    content = message.content
-    channel = message.channel
-    await client.send_message(channel, '@{}가 #{} 채널에서 메시지를 지웠습니다\n{}'.format(author, channel, content))
-'''
+
+
+# async def on_voice_state_update(before, after):
+#     if not before.voice_channel and after.voice_channel:
+#         print(after.display_name + " joined voice channel: " + after.voice_channel.name)
+#     elif before.voice_channel and after.voice_channel and before.voice_channel != after.voice_channel:
+#         print(after.display_name + " changed voice channel from " + before.voice_channel.name + " to " + after.voice_channel.name)
+#     elif before.voice_channel and not after.voice_channel:
+#         print(after.display_name + " left voice channel: " + before.voice_channel.name)
+
+# @client.event
+# async def on_message_delete(message):
+#     author = message.author
+#     content = message.content
+#     channel = message.channel
+#     await client.send_message(channel, '@{}가 #{} 채널에서 메시지를 지웠습니다\n{}'.format(author, channel, content))
 
 # 특정 인물이 채팅 칠 때마다 특정 채팅 치기
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-f = open('./TOKEN.txt', 'r')
-TOKEN = f.read()
-f.close()
-
-client.run(TOKEN)
+client.run(_token.TOKEN1)
