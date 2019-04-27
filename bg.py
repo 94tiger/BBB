@@ -13,6 +13,11 @@ def get_ihtml(url):
     return _ihtml
 
 def get_stat(pubgid, pubgmode):
+    """
+    :param pubgid:
+    :param pubgmode:
+    :return: stat [stat_KD, stat_AVD, stat_NoG, stat_PoV, avatar_img] [K/D, 평균딜, 게임수,
+    """
     URL = ("https://dak.gg/profile/" + pubgid)
     ihtml = get_ihtml(URL)
     isoup = BeautifulSoup(ihtml, 'html.parser')

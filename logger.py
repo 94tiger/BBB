@@ -13,10 +13,10 @@ client = discord.Client()
 
 def find_channel(server, refresh=False):
     """
-    Find and return the channel to log the voice events to.
+    음성 이벤트를 기록할 채널을 찾아 반환한다.
 
-    :param server: The server to find the channel for.
-    :param refresh: Whether to refresh the channel cache for this server.
+    :param server: 채널을 찾을 서버
+    :param refresh: 이 서버의 채널 캐시를 새로 고칠 지 여부
     """
     if not refresh and server in server_channels:
         return server_channels[server]
@@ -26,7 +26,6 @@ def find_channel(server, refresh=False):
             print("%s: refreshed destination log channel" % server)
             server_channels[server] = channel
             return channel
-
     return None
 
 
@@ -88,4 +87,4 @@ async def on_voice_state_update(member_before, member_after):
                 config.CHANNEL_NAME, server, exception))
 
 
-client.run(config.BOT_TOKEN)
+client.run(config.TOKEN)

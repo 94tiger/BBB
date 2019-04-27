@@ -13,6 +13,10 @@ def get_html(url):
     return _html
 
 def get_gegle(gallery):
+    """
+    :param gallery : 갤러리 str ex)야구갤러리 baseball_new7
+    :return: [index, [제목, 리플수, 링크]]
+    """
     if str(gallery) == "issuezoom" or str(gallery) == "hit":
         URL = ("https://gall.dcinside.com/board/lists?id=" + str(gallery))
     else:
@@ -48,7 +52,6 @@ def get_gegle(gallery):
         else:
             j += 1
         i += 1
-        # gegle = [index, [제목, 리플수, 링크]]
 
     return gegle
 

@@ -12,7 +12,7 @@ import openpyxl
 import image
 import bg
 import gegle
-import _token
+import config
 
 client = discord.Client()
 
@@ -32,7 +32,6 @@ async def on_ready():
 async def on_message(message):
     return
 
-
 @client.event
 async def on_message(message):
     if message.author.bot:
@@ -40,47 +39,24 @@ async def on_message(message):
 
     now = datetime.now(timezone('Asia/Seoul'))
 
-    author = message.author
-    content = message.content
-
     if message.server is not None:
         role_jungwaja = discord.utils.get(message.server.roles, name="전과자")
         role_nochat = discord.utils.get(message.server.roles, name="채팅금지(공지확인)")
         role_baebung = discord.utils.get(message.server.roles, name="배붕이")
 
-    # print('{}: {}'.format(author, content))
-
-    # 신고함채널 설정
-    # if message.content.startswith("$신고함채널설정"):
-    #     contactus_channel = message.content.split(" ")
-    #     contact_channel = contactus_channel[1]
-    #
-    # if message.server is None and message.author.id != '480847872074448906':
-    #     await client.send_message(contact_channel, message.content)
-
-    # 건의함 기능 (DM이용)
-    # contact_channel = client.get_channel('446335093254914050')
-    # if message.server is None and message.author.id != '480847872074448906':
-    #     embed_contactus = discord.Embed(title="닉네임 : " + str(message.author), description=message.content,
-    #                                     color=0x1895a7)
-    #     if message.attachments:
-    #         embed_contactus.set_image(url=message.attachments[0]['proxy_url'])
-    #     await client.send_message(contact_channel, embed=embed_contactus)
-
     #건의함 기능 (채널 이용)
-    contact_channel = client.get_channel('446335093254914050')
-    watch_channel = client.get_channel('565011625325756416')
-    if message.channel == watch_channel:
+    """
+    :var contact_channel : 건의함
+    :var watch_channel : 건의함 확인용 채널   
+    """
+    contact_channel = client.get_channel('565011625325756416')
+    watch_channel = client.get_channel('446335093254914050')
+    if message.channel == contact_channel:
         embed_contactus = discord.Embed(title=str(message.author), description=message.content, color=0x1895a7)
         if message.attachments:
             embed_contactus.set_image(url=message.attachments[0]['proxy_url'])
-        await client.send_message(contact_channel, embed=embed_contactus)
+        await client.send_message(watch_channel, embed=embed_contactus)
         await client.delete_message(message)
-
-    contact_channel_2 = client.get_channel('370992213410185217')
-    watch_channel_2 = client.get_channel('565566826302668820')
-    if message.channel == watch_channel_2:
-        await client.send_message(contact_channel_2, message.content)
 
     # 배그 전적 확인
     if message.content.startswith("$전적"):
@@ -235,14 +211,6 @@ async def on_message(message):
         #     await client.send_message(message.channel, "전과 없음")
         # await client.send_message(message.channel, message.author.avatar_url)
 
-    # await client.send_message(message.channel, str(role_baebung) + " : " + str(role_baebung.id) + "\n" + str(role_jungwaja) + " : " + str(role_jungwaja.id) + "\n" + str(role_nochat) + " : " + str(role_nochat.id))
-
-    # if message.content.startswith('$이미지'):
-    #   img = message.content.split(" ")
-    #   imgsrc = image.get_image(img[1])
-    #   print(imgsrc)
-    #    await client.send_message(message.channel, imgsrc)
-
     # 처벌
     '''
     if "이기야" in message.content:
@@ -270,17 +238,12 @@ async def on_message(message):
         await client.add_roles(member, role_jungwaja)
         await client.add_roles(member, role_nochat)
     '''
-    # 일베용어 채팅필터
-    chat_filter_ilbe = ["고무통", "고무현", "까보전", "김머중", "노무", "노무추", "노무노무", "노미넴", "노시계", "노알라", "노짱", "다이쥬", "두부외상", "무현",
-                        "ㅁㅈㅎ", "민주화", "문죄인", "문재앙", "라디언", "슨상", "슨상님", "슨탄절", "운지", "이기야", "익이", "익이야", "일게이", "좌빨",
-                        "쩔뚜기", "쩔뚝이", "통구이", "핵슨상", "핵펭귄", "홍오쉐리", "盧", "MC무현"]
-    chat_filter_megal = ["소추", "6.9센치"]
     bypass_list = ['415535047203094541']
     contents = message.content.split(" ")
 
     if message.server is None:
         return
-    elif message.server.id == "291849424953409536":
+    elif message.server.id == config.server:
         for word in contents:
             if "502065016393039873" in [role.id for role in message.author.roles]:
                 out_d = now.day + 1
@@ -293,7 +256,7 @@ async def on_message(message):
                     out_d = now.day
                     out_h = now.hour + 12
             if "309912507257061388" in [role.id for role in message.author.roles]:
-                split_name = author.display_name.split(" ")
+                split_name = message.author.display_name.split(" ")
                 out_d_chk = split_name[1].split("일")
                 if out_d_chk[0].isdigit():
                     out_d = int(out_d_chk[0]) + 1
@@ -308,34 +271,34 @@ async def on_message(message):
                 #     if int(out_d_chk[0]) > 28:
                 #         out_d = 1
 
-            if not author.id in bypass_list:
-                if word in chat_filter_ilbe or word in chat_filter_megal:
-                    if word in chat_filter_ilbe:
+            if not message.author.id in bypass_list:
+                if word in config.chat_filter_ilbe or word in config.chat_filter_megal:
+                    if word in config.chat_filter_ilbe:
                         await client.send_message(message.channel, "삐빅, 일베충 검출")
-                        await client.change_nickname(author, "일베충 " + str(out_d) + "일 " + str(out_h) + "시 " + str(
+                        await client.change_nickname(message.author, "일베충 " + str(out_d) + "일 " + str(out_h) + "시 " + str(
                             now.minute) + "분 해제")
-                    if word in chat_filter_megal:
-                        await client.send_message(message.channel, "삐빅, 메갈 검출")
-                        await client.change_nickname(author, "메갈 " + str(out_d) + "일 " + str(out_h) + "시 " + str(
+                    if word in config.chat_filter_megal:
+                        await client.send_message(message.message.channel, "삐빅, 메갈 검출")
+                        await client.change_nickname(message.author, "메갈 " + str(out_d) + "일 " + str(out_h) + "시 " + str(
                             now.minute) + "분 해제")
                     try:
-                        await client.remove_roles(author, role_baebung)
+                        await client.remove_roles(message.author, role_baebung)
                         await asyncio.sleep(0.5)
                     except discord.Forbidden:
                         await client.send_message(message.channel, "권한이 없음")
                     try:
-                        await client.add_roles(author, role_jungwaja)
+                        await client.add_roles(message.author, role_jungwaja)
                         await asyncio.sleep(0.5)
                     except discord.Forbidden:
                         await client.send_message(message.channel, "권한이 없음")
                     try:
-                        await client.add_roles(author, role_nochat)
+                        await client.add_roles(message.author, role_nochat)
                         await asyncio.sleep(0.5)
                     except discord.Forbidden:
                         await client.send_message(message.channel, "권한이 없음")
 
         if message.content.startswith('$해제'):
-            split_name = author.display_name.split(" ")
+            split_name = message.author.display_name.split(" ")
             out_d_chk = split_name[1].split("일")
             out_h_chk = split_name[2].split("시")
             out_m_chk = split_name[3].split("분")
@@ -356,13 +319,13 @@ async def on_message(message):
                         out_h_chk[0]) + "시, 현재 시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
                 await client.send_message(message.channel, "나갈시간 됐다")
                 try:
-                    await client.remove_roles(author, role_nochat)
-                    await client.change_nickname(author, "")
+                    await client.remove_roles(message.author, role_nochat)
+                    await client.change_nickname(message.author, "")
                     await asyncio.sleep(0.5)
                 except discord.Forbidden:
-                    await client.send_message(author, "권한이 없음")
+                    await client.send_message(message.author, "권한이 없음")
                 try:
-                    await client.add_roles(author, role_baebung)
+                    await client.add_roles(message.author, role_baebung)
                     await asyncio.sleep(0.5)
                 except discord.Forbidden:
                     await client.send_message(message.channel, "권한이 없음")
@@ -377,7 +340,24 @@ async def on_message(message):
                         out_h_chk[0]) + "시, 현재 시간 : " + str(now.day) + "일 " + str(now.hour) + "시 " + str(now.minute) + "분")
                 await client.send_message(message.channel, "나갈시간 아직이다")
 
+    # 신고함채널 설정
+    # if message.content.startswith("$신고함채널설정"):
+    #     contactus_channel = message.content.split(" ")
+    #     contact_channel = contactus_channel[1]
+    #
+    # if message.server is None and message.author.id != '480847872074448906':
+    #     await client.send_message(contact_channel, message.content)
 
+    # 건의함 기능 (DM이용)
+    # contact_channel = client.get_channel('446335093254914050')
+    # if message.server is None and message.author.id != '480847872074448906':
+    #     embed_contactus = discord.Embed(title="닉네임 : " + str(message.author), description=message.content,
+    #                                     color=0x1895a7)
+    #     if message.attachments:
+    #         embed_contactus.set_image(url=message.attachments[0]['proxy_url'])
+    #     await client.send_message(contact_channel, embed=embed_contactus)
+
+# print('{}: {}'.format(author, content))
 
 # async def on_voice_state_update(before, after):
 #     if not before.voice_channel and after.voice_channel:
@@ -386,6 +366,13 @@ async def on_message(message):
 #         print(after.display_name + " changed voice channel from " + before.voice_channel.name + " to " + after.voice_channel.name)
 #     elif before.voice_channel and not after.voice_channel:
 #         print(after.display_name + " left voice channel: " + before.voice_channel.name)
+
+# 이미지 검색
+# if message.content.startswith('$이미지'):
+#   img = message.content.split(" ")
+#   imgsrc = image.get_image(img[1])
+#   print(imgsrc)
+#    await client.send_message(message.channel, imgsrc)
 
 # @client.event
 # async def on_message_delete(message):
@@ -398,4 +385,4 @@ async def on_message(message):
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-client.run(_token.TOKEN1)
+client.run(config.TOKEN)
