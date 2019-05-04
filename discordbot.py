@@ -107,7 +107,7 @@ async def on_message(message):
         embed_gegl.add_field(name=gallery_name + " 개념글", value=gegl_value, inline=False)
         await client.send_message(message.channel, embed=embed_gegl)
 
-    if message.content.startswith("$개드리"):
+    if message.content.startswith("$최신개드립"):
         dogdrip_channel = client.get_channel('573904343703748638')
 
         async for m in client.logs_from(dogdrip_channel, limit=1):
@@ -122,7 +122,6 @@ async def on_message(message):
         # if message.attachments:
         embed_dogdrip.set_image(url=m.attachments[0]['proxy_url'])
         await client.send_message(message.channel, embed=embed_dogdrip)
-
 
     if message.content.startswith("$개드립"):
         dogdrip = gegle.get_dogdrip()
@@ -357,7 +356,7 @@ async def dogdrip_post():
         # await client.send_message('573904343703748638', dogdrip[0])
         dogdrip_channel = client.get_channel('573904343703748638')
         await client.send_file(destination=dogdrip_channel, fp='./result/dogdrip.png', content="{} |?{} |?{}".format(dogdrip[0], dogdrip[1], dogdrip[2]))
-        await asyncio.sleep(300)
+        await asyncio.sleep(600)
 
 
 # print('{}: {}'.format(author, content))
@@ -388,4 +387,4 @@ async def dogdrip_post():
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-client.run(config.TOKEN1)
+client.run(config.TOKEN)

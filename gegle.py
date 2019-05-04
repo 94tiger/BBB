@@ -1,9 +1,9 @@
+# coding: utf-8
+
 import requests
 from bs4 import BeautifulSoup
 import re
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
 
 pattern = re.compile((r'\s+'))
 
@@ -133,9 +133,9 @@ def get_dogdrip_post():
     chrome_options.add_argument('disable-extensions')
     chrome_options.add_argument('disable-dev-shm-usage')
     chrome_options.add_argument('disable-gpu')
-    # chrome_options.add_argument('no-sandbox')
+    chrome_options.add_argument('no-sandbox')
+    chrome_options.add_argument("lang=ko_KR") # 한국어!
     # chrome_options.add_argument('window-size=1920x1080')
-    # chrome_options.add_argument("lang=ko_KR") # 한국어!
     # chrome_options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
     driver = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
     # driver.set_window_size(550, 1000)
@@ -162,13 +162,14 @@ def get_dogdrip_post():
     # 게시글 이동
     driver.get(post_link)
 
-    # 광고 가리기
-    driver.execute_script("window.scrollTo(0, 250)")
-
     # 1페이지 버튼 클릭
     if int(dogdrip_post[2]) > 50:
         commentp1btn = driver.find_element_by_xpath("//div[@class='ed pagination-container']/ul[@class='ed pagination pagewide']/li/a[(contains(text(), '1'))]")
         commentp1btn.click()
+
+    # 광고 가리기
+    # driver.execute_script("window.scrollTo(0, 0)")
+    driver.execute_script("window.scrollTo(0, 250)")
 
     # 캡처
     driver.save_screenshot('./result/dogdrip.png')
