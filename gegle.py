@@ -1,6 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 
 pattern = re.compile((r'\s+'))
 
@@ -120,3 +123,60 @@ def get_dogdrip():
 
     # URL = "https://gall.dcinside.com/board/lists?id=baseball_new7&exception_mode=recommend"
 
+def get_dogdrip_post():
+    URL = "https://www.dogdrip.net/dogdrip"
+    dogdrip_post = []
+
+    chrome_options = webdriver.ChromeOptions()
+    # chrome_options.add_extension('Adblock-Plus-kostenloser-Adblocker_v3.5.2.crx')
+    chrome_options.add_argument('headless')
+    chrome_options.add_argument('disable-extensions')
+    chrome_options.add_argument('disable-dev-shm-usage')
+    chrome_options.add_argument('disable-gpu')
+    # chrome_options.add_argument('no-sandbox')
+    # chrome_options.add_argument('window-size=1920x1080')
+    # chrome_options.add_argument("lang=ko_KR") # 한국어!
+    # chrome_options.add_argument("user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36")
+    driver = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
+    # driver.set_window_size(550, 1000)
+    driver.set_window_size(700, 700)
+    driver.implicitly_wait(3)
+
+    # 개드립 접속
+    driver.get(URL)
+    driver.implicitly_wait(3)
+    print("접속 성공")
+
+    # 개드립 첫번째 글 검색
+    post = driver.find_element_by_xpath("//td[@class='title']/a")
+    post_link = post.get_attribute('href')
+    dogdrip_post.append(post_link)
+
+    # 게시글 정보 확인
+    title = driver.find_element_by_xpath("//span[@class='ed title-link']")
+    dogdrip_post.append(title.text)
+
+    comment = driver.find_element_by_xpath("//span[@class='ed text-primary']")
+    dogdrip_post.append(comment.text)
+
+    # 게시글 이동
+    driver.get(post_link)
+
+    # 광고 가리기
+    driver.execute_script("window.scrollTo(0, 250)")
+
+    # 1페이지 버튼 클릭
+    if int(dogdrip_post[2]) > 50:
+        commentp1btn = driver.find_element_by_xpath("//div[@class='ed pagination-container']/ul[@class='ed pagination pagewide']/li/a[(contains(text(), '1'))]")
+        commentp1btn.click()
+
+    # 캡처
+    driver.save_screenshot('./result/dogdrip.png')
+    print("캡처 성공\n")
+    # post = driver.find_element_by_class_name('inner-container')
+    # post.screenshot('./result/dogdrip.png')
+
+    # 종료
+    driver.quit()
+
+    return dogdrip_post

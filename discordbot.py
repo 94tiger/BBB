@@ -9,6 +9,7 @@ from datetime import datetime
 import asyncio
 import random
 import openpyxl
+import time
 import image
 import bg
 import gegle
@@ -26,7 +27,7 @@ async def on_ready():
     print(client.user.id)
     print("-------------------------")
     await client.change_presence(game=discord.Game(name='디스코드 봇', type='1'))
-
+    client.loop.create_task(dogdrip_post())
 
 @commands.has_role(name="전과자")
 async def on_message(message):
@@ -105,6 +106,23 @@ async def on_message(message):
         embed_gegl = discord.Embed(color=0xdc6363)
         embed_gegl.add_field(name=gallery_name + " 개념글", value=gegl_value, inline=False)
         await client.send_message(message.channel, embed=embed_gegl)
+
+    if message.content.startswith("$개드리"):
+        dogdrip_channel = client.get_channel('573904343703748638')
+
+        async for m in client.logs_from(dogdrip_channel, limit=1):
+            print(m.clean_content)
+        dogdrip = m.clean_content.split(" |?")
+        print(dogdrip[0])
+        print(dogdrip[1])
+        print(dogdrip[2])
+        dogdrip_value = "{} [{}]".format(dogdrip[1], dogdrip[2])
+
+        embed_dogdrip = discord.Embed(title=dogdrip_value, url=dogdrip[0], color=0x1895a7)
+        # if message.attachments:
+        embed_dogdrip.set_image(url=m.attachments[0]['proxy_url'])
+        await client.send_message(message.channel, embed=embed_dogdrip)
+
 
     if message.content.startswith("$개드립"):
         dogdrip = gegle.get_dogdrip()
@@ -212,32 +230,6 @@ async def on_message(message):
         # await client.send_message(message.channel, message.author.avatar_url)
 
     # 처벌
-    '''
-    if "이기야" in message.content:
-        memid = message.content.split(" ")
-        file = openpyxl.load_workbook("경고.xlsx")
-        member = discord.utils.get(client.get_all_members(), id="335014396088680453")
-        sheet = file.active
-
-        for i in range(1, 31):
-            if str(sheet["A" + str(i)].value) == str(message.author.id):
-                sheet["B" + str(i)].value = int(sheet["B" + str(i)].value) + 1
-
-                if int(sheet["B" + str(i)].value) == 3:
-                    await client.ban(member, 1)
-                    await client.change_nickname(member, now.tm_mday + "일 " + now.tm_hour + "시 " + now.tm_min + "분 해제")
-
-                break
-            if str(sheet["A" + str(i)].value) == "-":
-                sheet["A" + str(i)].value = str(message.author.id)
-                sheet["B" + str(i)].value = 1
-                break
-        file.save("경고.xlsx")
-        await client.send_message(message.channel, "경고.")
-        await client.change_nickname(member, str(now.tm_mday) + "일 " + str(now.tm_hour) + "시 " + str(now.tm_min) + "분 해제")
-        await client.add_roles(member, role_jungwaja)
-        await client.add_roles(member, role_nochat)
-    '''
     bypass_list = ['415535047203094541']
     contents = message.content.split(" ")
 
@@ -357,6 +349,17 @@ async def on_message(message):
     #         embed_contactus.set_image(url=message.attachments[0]['proxy_url'])
     #     await client.send_message(contact_channel, embed=embed_contactus)
 
+async def dogdrip_post():
+    while True:
+        dogdrip = gegle.get_dogdrip_post()
+        print("{} |?{} |?{}".format(dogdrip[0], dogdrip[1], dogdrip[2]))
+
+        # await client.send_message('573904343703748638', dogdrip[0])
+        dogdrip_channel = client.get_channel('573904343703748638')
+        await client.send_file(destination=dogdrip_channel, fp='./result/dogdrip.png', content="{} |?{} |?{}".format(dogdrip[0], dogdrip[1], dogdrip[2]))
+        await asyncio.sleep(300)
+
+
 # print('{}: {}'.format(author, content))
 
 # async def on_voice_state_update(before, after):
@@ -385,4 +388,4 @@ async def on_message(message):
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-client.run(config.TOKEN)
+client.run(config.TOKEN1)
