@@ -9,7 +9,9 @@ pattern = re.compile((r'\s+'))
 
 def get_html(url):
     _html = ""
-    resp = requests.get(url)
+    userAgent = 'Mozilla/5.0 (Linux; Android 8.0.0; moto g(6) play) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.80 Mobile Safari/537.36'
+    headers = {'user-agent': userAgent}
+    resp = requests.get(url, headers = headers)
     # status_code가 정상이면
     if resp.status_code == 200:
         _html = resp.text
@@ -17,45 +19,44 @@ def get_html(url):
 
 def get_gegle(gallery):
     """
-    :param gallery : 갤러리 str ex)야구갤러리 baseball_new7
+    :param gallery : 갤러리 str ex)야구갤러리 baseball_new8
     :return: [index, [제목, 리플수, 링크]]
     """
     if str(gallery) == "issuezoom" or str(gallery) == "hit":
-        URL = ("https://gall.dcinside.com/board/lists?id=" + str(gallery))
+        URL = ("https://m.dcinside.com/board/" + str(gallery))
     else:
-        URL = ("https://gall.dcinside.com/board/lists?id=" + str(gallery) + "&exception_mode=recommend")
-
+        URL = ("https://m.dcinside.com/board/" + str(gallery) + "?recommend=1")
     # URL = "https://gall.dcinside.com/board/lists?id=baseball_new7&exception_mode=recommend"
     html = get_html(URL)
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = BeautifulSoup(html, "html.parser")
 
-    element = soup.find('table', {'class': 'gall_list'})
-    element = element.find_all('tr', {'class' : 'ub-content'})
+    element = soup.find_all('div', {'class': 'gall-detail-lnktb'})
+
+    titles = soup.select('ul.gall-detail-lst > li > div > a.lt > span > span.detail-txt')
+    links = soup.select('ul.gall-detail-lst > li > div > a.lt')
+    authors = soup.select('ul.gall-detail-lst > li > div > a.lt > ul > li:nth-child(1)')
+    comments = soup.select('ul.gall-detail-lst > li > div > a.rt > span')
+
 
     gegle = []
-    i = 1
-    j = 6
-    while i < j:
+
+    title = []
+    link = []
+    comment = []
+    for i in range(len(titles)):
+        title.append(titles[i].text)
+        link.append(links[i].get('href'))
+        comment.append(comments[i].text)
+
+    for i in range(5):
         line = []
-        link = element[i]
-        gegle_number = str(link)[str(link).find('um">') + 4:str(link).find('</td>')]
-        # 념글 번호로 공지여부 판별
-        if gegle_number.isdigit():
-            link = element[i].find('td', {'class': 'gall_tit ub-word'})
 
-            gegle_link = link.find('a')['href']
-            gegle_name = str(link)[str(link).find('/em>') + 4:str(link).find('</a>')]
-            gegle_reply = str(link)[str(link).find('um">') + 4:str(link).find('</span')]
+        line.append(title[i])
+        line.append(comment[i])
+        line.append(link[i])
 
-            line.append(gegle_name)
-            line.append(gegle_reply)
-            line.append('http://gall.dcinside.com' + gegle_link)
-
-            gegle.append(line)
-        else:
-            j += 1
-        i += 1
-
+        gegle.append(line)
+    print(gegle)
     return gegle
 
 def get_mgegle(gallery):
@@ -63,7 +64,7 @@ def get_mgegle(gallery):
 
     html = get_html(URL)
     soup = BeautifulSoup(html, 'html.parser')
-
+    print(soup)
     element = soup.find('table', {'class': 'gall_list'})
     element = element.find_all('tr', {'class': 'ub-content us-post'})
     gegle = []
@@ -95,7 +96,6 @@ def get_dogdrip():
     # URL = "https://gall.dcinside.com/board/lists?id=baseball_new7&exception_mode=recommend"
     html = get_html(URL)
     soup = BeautifulSoup(html, 'html.parser')
-
     element = soup.find_all('td', {'class': 'title'})
 
     dogdrip = []
@@ -145,7 +145,7 @@ def get_dogdrip_post():
     # 개드립 접속
     driver.get(URL)
     driver.implicitly_wait(3)
-    print("접속 성공")
+    print("Connect Success")
 
     # 개드립 첫번째 글 검색
     post = driver.find_element_by_xpath("//td[@class='title']/a")
@@ -173,7 +173,7 @@ def get_dogdrip_post():
 
     # 캡처
     driver.save_screenshot('./result/dogdrip.png')
-    print("캡처 성공\n")
+    print("Capture Success\n")
     # post = driver.find_element_by_class_name('inner-container')
     # post.screenshot('./result/dogdrip.png')
 
