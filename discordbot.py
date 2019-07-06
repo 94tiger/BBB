@@ -84,9 +84,14 @@ async def on_message(message):
             tpp = False
 
         stat = game_stat.get_pubg_stat(pubgid, pubgmode_class, tpp)
-
+        # ID 존재
         if stat[0] == True:
-            # ID 존재
+            # TPP 유무
+            if tpp == True:
+                pubgmode = "3인칭 " + pubgmode
+            else:
+                pubgmode = pubgmode.replace("1", "1인칭 ")
+            # 전적 유무
             if stat[1] == True:
                 embed_stat = discord.Embed(color=0xdc6363)
                 embed_stat.set_thumbnail(url=stat[6])
@@ -95,25 +100,42 @@ async def on_message(message):
                 embed_stat.add_field(name="게임 수", value=stat[4], inline=True)
                 embed_stat.add_field(name="승률", value=stat[5], inline=True)
 
-                await client.send_message(message.channel, content="`" + pubgid + "`님의 `3인칭 " + pubgmode + "` 전적", embed=embed_stat)
+                await client.send_message(message.channel, content="`" + pubgid + "`님의 `" + pubgmode + "` 전적", embed=embed_stat)
             else:
-                pubgmode = pubgmode.replace("1", "1인칭 ")
                 await client.send_message(message.channel, "`" + pubgid + "`님의 `" + pubgmode + "` 전적이 존재하지 않습니다.")
         else:
             await client.send_message(message.channel, "`" + pubgid + "`님의 ID가 존재하지 않습니다.")
+
     if message.content.startswith("$배그"):
         stat_str = message.content.split(" ")
         pubgid = stat_str[1]
         pubgmode = stat_str[2]
         if pubgmode == "솔로":
             pubgmode_str = "solo"
+            tpp = True
         if pubgmode == "듀오":
             pubgmode_str = "duo"
+            tpp = True
         if pubgmode == "스쿼드":
             pubgmode_str = "squad"
-        game_stat.get_pubg_stat_screenshot(pubgid, pubgmode_str)
+            tpp = True
+        if pubgmode == "1솔로":
+            pubgmode_str = "solo"
+            tpp = False
+        if pubgmode == "1듀오":
+            pubgmode_str = "duo"
+            tpp = False
+        if pubgmode == "1스쿼드":
+            pubgmode_str = "squad"
+            tpp = False
 
-        await client.send_file(message.channel, fp='./stat/' + pubgid + '_' + pubgmode_str + '.png' ,content="`" + pubgid + "`님의 __**" + pubgmode + "**__ 전적입니다.")
+        game_stat.get_pubg_stat_screenshot(pubgid, pubgmode_str, tpp)
+        if tpp == True:
+            pubgmode = "3인칭 " + pubgmode
+            await client.send_file(message.channel, fp='./stat/' + pubgid + '_' + pubgmode_str + '_tpp.png' ,content="`" + pubgid + "`님의 **" + pubgmode + "** 전적입니다.")
+        else:
+            pubgmode = pubgmode.replace("1", "1인칭 ")
+            await client.send_file(message.channel, fp='./stat/' + pubgid + '_' + pubgmode_str + '_fpp.png' ,content="`" + pubgid + "`님의 **" + pubgmode + "** 전적입니다.")
 
     if message.content.startswith("$롤"):
         stat_str = message.content.split(" ")
