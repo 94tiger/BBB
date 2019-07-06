@@ -161,7 +161,7 @@ async def on_message(message):
         await client.send_message(message.channel, embed=embed_dogdrip)
 
     if message.content.startswith('$명령어'):
-        command_msg = "```md\n# 기본\n* $명령어 - 봇 명령어 안내\n* $주사위 [굴릴 주사위]\n# 선택 \n* $골라 [1 2 3 ...] - 1,2,3랜덤 선택\n* $뭐먹지 - 메뉴 랜덤 \n* $치킨뭐먹지 - 치킨 랜덤\n* $뭔겜할까 - 게임 랜덤 \n* $맵 - 맵 랜덤\n# 기능 \n* $전적 [배그아이디] [솔로|듀오|스쿼드] - 배그 전적 검색\n# 커뮤니티\n* $념글 [힛갤|야갤|중갤|이슈줌] - 최신 개념글 목록\n* $개드립 - 최신 개드립 목록 \n# 서버 \n* $해제 - 지옥 탈출```"
+        command_msg = "```md\n# 기본\n* $명령어 - 봇 명령어 안내\n* $주사위 [굴릴 주사위]\n# 선택 \n* $골라 [1 2 3 ...] - 1,2,3랜덤 선택\n* $뭐먹지 - 메뉴 랜덤 \n* $치킨뭐먹지 - 치킨 랜덤\n* $뭔겜할까 - 게임 랜덤 \n* $맵 - 맵 랜덤\n# 기능 \n* $전적 [배그아이디] [솔로|듀오|스쿼드] - 배그 전적 검색\n* $배그 [배그아이디] [솔로|듀오|스쿼드]\n* $롤 [롤아이디]\n# 커뮤니티\n* $념글 [힛갤|야갤|중갤|이슈줌] - 최신 개념글 목록\n* $개드립 - 최신 개드립 목록 \n# 서버 \n* $해제 - 지옥 탈출```"
         await client.send_message(message.author, command_msg)
 
     if message.content.startswith('$서버'):
