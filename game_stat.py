@@ -109,12 +109,13 @@ def get_pubg_stat_screenshot(pubgid, pubgmode, tpp):
     data_id = "pc-2018-03|fpp|"
 
     # pubg.op.gg 접속
+    driver.implicitly_wait(0.5)
     driver.get(URL + pubgid)
     print("Successful Connection to https://pubg.op.gg")
 
     driver.find_element_by_xpath("//button[@id='renewBtn']").click()
     print("Refresh Success")
-    driver.implicitly_wait(0.2)
+    driver.implicitly_wait(2)
 
     data_id = driver.find_element_by_xpath(
         "//*/div/div/div/div/h4/span[text() = '솔로']/parent::h4/parent::div/parent::div/parent::div/parent::div").get_attribute(
@@ -126,24 +127,37 @@ def get_pubg_stat_screenshot(pubgid, pubgmode, tpp):
         pubgmode_str = "듀오"
     if pubgmode == "squad":
         pubgmode_str = "스쿼드"
-
+    # 'data-status="fpp"'
+    tpp_status = driver.find_element_by_xpath("//input[@id='rankedStatsChkMode']").get_attribute("data-status")
     if tpp == True:
+        if tpp_status == "fpp":
+            driver.find_element_by_xpath("//input[@id='rankedStatsChkMode']").click()
+            print("tpp clicked")
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR,
+                                                "#rankedStatsWrap > div.ranked-stats-wrapper__list > div[data-id='pc-2018-03|tpp|'][style='display: block;'][data-async='2']"))
+            )
+            driver.implicitly_wait(6)
+
         stat = driver.find_element_by_xpath("//*/div[@data-id='" + data_id + "']/div/div/div/h4/span[text() = '" + pubgmode_str + "']/parent::h4/parent::div")
+
         stat.screenshot('./stat/'+ pubgid + '_' + pubgmode + '_tpp.png')
         print("Screenshot Success")
     if tpp == False:
         pubgmode_str = pubgmode_str + " FPP"
         data_id = data_id.replace("tpp", "fpp")
-        driver.find_element_by_xpath("//input[@id='rankedStatsChkMode']").click()
-        try:
-            driver.implicitly_wait(7)
-            # WebDriverWait(driver, 10).until(
-            #     EC.presence_of_element_located((By.CSS_SELECTOR, "#rankedStatsWrap > div.ranked-stats-wrapper__list > div[data-id='pc-2018-03|fpp|'][style='display: block;'][data-async='2']"))
-            # )
-        finally:
-            stat = driver.find_element_by_xpath("//*/div[@data-id='" + data_id + "']/div/div/div/h4/span[text() = '" + pubgmode_str + "']/parent::h4/parent::div")
-            stat.screenshot('./stat/' + pubgid + '_' + pubgmode + '_fpp.png')
-            print("Screenshot Success")
+
+        if tpp_status == "tpp":
+            driver.find_element_by_xpath("//input[@id='rankedStatsChkMode']").click()
+            print("fpp clicked")
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "#rankedStatsWrap > div.ranked-stats-wrapper__list > div[data-id='pc-2018-03|fpp|'][style='display: block;'][data-async='2']"))
+            )
+            driver.implicitly_wait(6)
+
+        stat = driver.find_element_by_xpath("//*/div[@data-id='" + data_id + "']/div/div/div/h4/span[text() = '" + pubgmode_str + "']/parent::h4/parent::div")
+        stat.screenshot('./stat/' + pubgid + '_' + pubgmode + '_fpp.png')
+        print("Screenshot Success")
 
     # 종료
     driver.quit()
