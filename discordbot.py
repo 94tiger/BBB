@@ -11,7 +11,7 @@ import random
 import openpyxl
 import time
 import image
-import bg
+import game_stat
 import bgg
 import gegle
 import config
@@ -28,7 +28,7 @@ async def on_ready():
     print(client.user.id)
     print("-------------------------")
     await client.change_presence(game=discord.Game(name='디스코드 봇', type='1'))
-    client.loop.create_task(dogdrip_post())
+    # client.loop.create_task(dogdrip_post())
 
 @commands.has_role(name="전과자")
 async def on_message(message):
@@ -72,7 +72,7 @@ async def on_message(message):
         if pubgmode == "스쿼드":
             pubgmode_class = "squad modeItem"
 
-        stat = bg.get_stat(pubgid, pubgmode_class)
+        stat = game_stat.get_pubg_stat(pubgid, pubgmode_class)
 
         embed_stat = discord.Embed(color=0xdc6363)
         embed_stat.add_field(name="K/D", value=stat[0], inline=True)
@@ -81,9 +81,6 @@ async def on_message(message):
         embed_stat.add_field(name="승률", value=stat[3], inline=True)
         embed_stat.set_thumbnail(url=stat[4])
         await client.send_message(message.channel, embed=embed_stat)
-
-        # for value in stat:
-        # await client.send_message(message.channel, stat)
 
     if message.content.startswith("$배그"):
         stat_str = message.content.split(" ")
@@ -95,9 +92,26 @@ async def on_message(message):
             pubgmode_str = "duo"
         if pubgmode == "스쿼드":
             pubgmode_str = "squad"
-        bgg.get_stat(pubgid, pubgmode_str)
+        game_stat.get_pubg_stat_screenshot(pubgid, pubgmode_str)
 
         await client.send_file(message.channel, fp='./stat/' + pubgid + '_' + pubgmode_str + '.png' ,content="`" + pubgid + "`님의 __**" + pubgmode + "**__ 전적입니다.")
+
+    if message.content.startswith("$롤"):
+        stat_str = message.content.split(" ")
+        lolid = stat_str[1]
+        stat = game_stat.get_lol_stat(lolid)
+        # stat = [랭크유무, 프로필이미지링크, 티어아이콘링크, 랭크타입, 현재티어, 점수, 승, 패, 승률]
+        embed_stat = discord.Embed(color=0xdc6363, timestamp=now)
+        embed_stat.set_author(name=lolid, url="https://www.op.gg/summoner/userName=" + lolid, icon_url=stat[1])
+        embed_stat.set_footer(text="from OP.GG", icon_url="https://pbs.twimg.com/profile_images/928183232096432128/_rMzMIU4_400x400.jpg")
+        # 대체 이미지 https://opgg-static.akamaized.net/images/site/about/img-logo-opgg.png
+        embed_stat.set_thumbnail(url=stat[2])
+        if stat[0] == True:
+            embed_stat.add_field(name=stat[3] + " " + stat[4], value="**" + stat[5] + "** / `" + stat[6] + "` `"+ stat[7] + "` / `"+ stat[8] + "`")
+        else:
+            embed_stat.add_field(name="Unranked", value="랭크 전적이 존재하지 않는 유저입니다.")
+        # embed_stat.add_field(name="Most 1", value="```\n트위스티드 페이트\t|3.54\t|50%\t|337게임```")
+        await client.send_message(message.channel, content="`" + lolid + "`님의 전적", embed=embed_stat)
 
     if message.content.startswith("$념글"):
         gegle_str = message.content.split(" ")
@@ -467,4 +481,4 @@ async def dogdrip_post():
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-client.run(config.TOKEN)
+client.run(config.TOKEN1)
