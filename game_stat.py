@@ -14,7 +14,7 @@ def get_ihtml(url):
         _ihtml = iresp.text
     return _ihtml
 
-def get_pubg_stat(pubgid, pubgmode):
+def get_pubg_stat(pubgid, pubgmode, tpp):
     """
     :param pubgid:
     :param pubgmode:
@@ -23,36 +23,54 @@ def get_pubg_stat(pubgid, pubgmode):
     URL = ("https://dak.gg/profile/" + pubgid)
     ihtml = get_ihtml(URL)
     isoup = BeautifulSoup(ihtml, 'html.parser')
-    ielement = isoup.find('section', {'class': pubgmode})
-    # avatar = isoup.find('section', {'class' : })
     avatar = isoup.find('div', {'class' : 'userInfo'})
-    avatar = avatar.find('img')
+
+    try:
+        avatar = avatar.find('img')
+        id_exist = True
+    except AttributeError:
+        id_exist = False
+        stat = [id_exist]
+        return stat
+
     avatar = avatar.get('src')
     if avatar == "/images/icons/avatars/kakao-dakgg.jpg":
         avatar = "https://dak.gg/images/icons/avatars/kakao-dakgg.jpg"
     avatar_img = str(avatar)
-    stat_KD = ielement.find('div', {'class': 'kd stats-item stats-top-graph'})
-    stat_KD = stat_KD.find('p', {'class':'value'})
-    stat_KD = str(stat_KD)[str(stat_KD).find('ue">') + 4:str(stat_KD).find('</p>')]
-    stat_KD = re.sub(pattern, '', stat_KD)
 
-    stat_AVD = ielement.find('div', {'class': 'deals stats-item stats-top-graph'})
-    stat_AVD = stat_AVD.find('p', {'class': 'value'})
-    stat_AVD = str(stat_AVD)[str(stat_AVD).find('ue">') + 4:str(stat_AVD).find('</p>')]
-    stat_AVD = re.sub(pattern, '', stat_AVD)
+    ielement = isoup.find('section', {'class': pubgmode})
+    if tpp == True:
+        ielement = ielement.find('div', {'class': 'mode-section tpp'})
+    else:
+        ielement = ielement.find('div', {'class': 'mode-section fpp'})
 
-    stat_PoV = ielement.find('div', {'class': 'winratio stats-item stats-top-graph'})
-    stat_PoV= stat_PoV.find('p', {'class': 'value'})
-    stat_PoV = str(stat_PoV)[str(stat_PoV).find('ue">') + 4:str(stat_PoV).find('</p>')]
-    stat_PoV = re.sub(pattern, '', stat_PoV)
+    try:
+        stat_KD = ielement.find('div', {'class': 'kd stats-item stats-top-graph'})
+        stat_KD = stat_KD.find('p', {'class':'value'})
+        stat_KD = str(stat_KD)[str(stat_KD).find('ue">') + 4:str(stat_KD).find('</p>')]
+        stat_KD = re.sub(pattern, '', stat_KD)
 
-    stat_NoG = ielement.find('div', {'class': 'games stats-item stats-top-graph'})
-    stat_NoG = stat_NoG.find('p', {'class': 'value'})
-    stat_NoG = str(stat_NoG)[str(stat_NoG).find('ue">') + 4:str(stat_NoG).find('</p>')]
-    stat_NoG = re.sub(pattern, '', stat_NoG)
+        stat_AVD = ielement.find('div', {'class': 'deals stats-item stats-top-graph'})
+        stat_AVD = stat_AVD.find('p', {'class': 'value'})
+        stat_AVD = str(stat_AVD)[str(stat_AVD).find('ue">') + 4:str(stat_AVD).find('</p>')]
+        stat_AVD = re.sub(pattern, '', stat_AVD)
 
-    # stat_list = "K/D : `" + stat_KD + "` 평딜 : ` " + stat_AVD + "` 게임수 : ` " + stat_NoG + "` 승률 : `" + stat_PoV + "`\n" + avatar_img
-    stat = [stat_KD, stat_AVD, stat_NoG, stat_PoV, avatar_img]
+        stat_PoV = ielement.find('div', {'class': 'winratio stats-item stats-top-graph'})
+        stat_PoV= stat_PoV.find('p', {'class': 'value'})
+        stat_PoV = str(stat_PoV)[str(stat_PoV).find('ue">') + 4:str(stat_PoV).find('</p>')]
+        stat_PoV = re.sub(pattern, '', stat_PoV)
+
+        stat_NoG = ielement.find('div', {'class': 'games stats-item stats-top-graph'})
+        stat_NoG = stat_NoG.find('p', {'class': 'value'})
+        stat_NoG = str(stat_NoG)[str(stat_NoG).find('ue">') + 4:str(stat_NoG).find('</p>')]
+        stat_NoG = re.sub(pattern, '', stat_NoG)
+
+        stat_exist = True
+        # stat_exist =    stat_list = "K/D : `" + stat_KD + "` 평딜 : ` " + stat_AVD + "` 게임수 : ` " + stat_NoG + "` 승률 : `" + stat_PoV + "`\n" + avatar_img
+        stat = [id_exist, stat_exist, stat_KD, stat_AVD, stat_NoG, stat_PoV, avatar_img]
+    except AttributeError:
+        stat_exist = False
+        stat = [id_exist, stat_exist]
 
     # if int(stat_AVD) < 100:
     #     stat = ""
@@ -94,7 +112,9 @@ def get_pubg_stat_screenshot(pubgid, pubgmode):
     driver.implicitly_wait(0.2)
 
     # Screenshots stat
+
     stat = driver.find_element_by_xpath("//div[@class='ranked-stats-wrapper__card ']/*[@class='ranked-stats-wrapper__card-title ranked-stats-wrapper__card-title--" + pubgmode + "']/parent::div")
+
     stat.screenshot('./stat/'+ pubgid + '_' + pubgmode + '.png')
 
     # 종료

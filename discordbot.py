@@ -27,7 +27,7 @@ async def on_ready():
     print(client.user.id)
     print("-------------------------")
     await client.change_presence(game=discord.Game(name='디스코드 봇', type='1'))
-    client.loop.create_task(dogdrip_post())
+    # client.loop.create_task(dogdrip_post())
 
 @commands.has_role(name="전과자")
 async def on_message(message):
@@ -66,21 +66,41 @@ async def on_message(message):
         pubgmode = stat_str[2]
         if pubgmode == "솔로":
             pubgmode_class = "solo modeItem"
+            tpp = True
         if pubgmode == "듀오":
             pubgmode_class = "duo modeItem"
+            tpp = True
         if pubgmode == "스쿼드":
             pubgmode_class = "squad modeItem"
+            tpp = True
+        if pubgmode == "1솔로":
+            pubgmode_class = "solo modeItem"
+            tpp = False
+        if pubgmode == "1듀오":
+            pubgmode_class = "duo modeItem"
+            tpp = False
+        if pubgmode == "1스쿼드":
+            pubgmode_class = "squad modeItem"
+            tpp = False
 
-        stat = game_stat.get_pubg_stat(pubgid, pubgmode_class)
+        stat = game_stat.get_pubg_stat(pubgid, pubgmode_class, tpp)
 
-        embed_stat = discord.Embed(color=0xdc6363)
-        embed_stat.add_field(name="K/D", value=stat[0], inline=True)
-        embed_stat.add_field(name="평균 딜량", value=stat[1], inline=True)
-        embed_stat.add_field(name="게임 수", value=stat[2], inline=True)
-        embed_stat.add_field(name="승률", value=stat[3], inline=True)
-        embed_stat.set_thumbnail(url=stat[4])
-        await client.send_message(message.channel, embed=embed_stat)
+        if stat[0] == True:
+            # ID 존재
+            if stat[1] == True:
+                embed_stat = discord.Embed(color=0xdc6363)
+                embed_stat.set_thumbnail(url=stat[6])
+                embed_stat.add_field(name="K/D", value=stat[2], inline=True)
+                embed_stat.add_field(name="평균 딜량", value=stat[3], inline=True)
+                embed_stat.add_field(name="게임 수", value=stat[4], inline=True)
+                embed_stat.add_field(name="승률", value=stat[5], inline=True)
 
+                await client.send_message(message.channel, content="`" + pubgid + "`님의 `3인칭 " + pubgmode + "` 전적", embed=embed_stat)
+            else:
+                pubgmode = pubgmode.replace("1", "1인칭 ")
+                await client.send_message(message.channel, "`" + pubgid + "`님의 `" + pubgmode + "` 전적이 존재하지 않습니다.")
+        else:
+            await client.send_message(message.channel, "`" + pubgid + "`님의 ID가 존재하지 않습니다.")
     if message.content.startswith("$배그"):
         stat_str = message.content.split(" ")
         pubgid = stat_str[1]
@@ -161,7 +181,7 @@ async def on_message(message):
         await client.send_message(message.channel, embed=embed_dogdrip)
 
     if message.content.startswith('$명령어'):
-        command_msg = "```md\n# 기본\n* $명령어 - 봇 명령어 안내\n* $주사위 [굴릴 주사위]\n# 선택 \n* $골라 [1 2 3 ...] - 1,2,3랜덤 선택\n* $뭐먹지 - 메뉴 랜덤 \n* $치킨뭐먹지 - 치킨 랜덤\n* $뭔겜할까 - 게임 랜덤 \n* $맵 - 맵 랜덤\n# 기능 \n* $전적 [배그아이디] [솔로|듀오|스쿼드] - 배그 전적 검색 (dak.gg 기준 / 갱신 x)\n* $배그 [배그아이디] [솔로|듀오|스쿼드] - 배그 전적 검색 (pubg.op.gg 기준 / 갱신 ok)\n* $롤 [롤아이디] - 롤 전적 검색 (op.gg 기준 / 갱신 x)\n# 커뮤니티\n* $념글 [힛갤|야갤|중갤|이슈줌] - 최신 개념글 목록\n* $개드립 - 최신 개드립 목록 \n# 서버 \n* $해제 - 지옥 탈출```"
+        command_msg = "```md\n# 기본\n* $명령어 - 봇 명령어 안내\n* $주사위 [굴릴 주사위]\n# 선택 \n* $골라 [1 2 3 ...] - 1,2,3랜덤 선택\n* $뭐먹지 - 메뉴 랜덤 \n* $치킨뭐먹지 - 치킨 랜덤\n* $뭔겜할까 - 게임 랜덤 \n* $맵 - 맵 랜덤\n# 기능 \n* $전적 [배그아이디] [솔로|듀오|스쿼드|1솔로|1듀오|1스쿼드] - 배그 전적 검색 (dak.gg 기준 / 갱신 x)\n* $배그 [배그아이디] [솔로|듀오|스쿼드] - 배그 전적 검색 (pubg.op.gg 기준 / 갱신 ok)\n* $롤 [롤아이디] - 롤 전적 검색 (op.gg 기준 / 갱신 x)\n# 커뮤니티\n* $념글 [힛갤|야갤|중갤|롤갤|돌갤|이슈줌] - 최신 개념글 목록\n* $개드립 - 최신 개드립 목록 \n# 서버 \n* $해제 - 지옥 탈출```"
         await client.send_message(message.author, command_msg)
 
     if message.content.startswith('$서버'):
@@ -480,4 +500,4 @@ async def dogdrip_post():
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-client.run(config.TOKEN)
+client.run(config.TOKEN1)
