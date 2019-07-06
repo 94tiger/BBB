@@ -12,7 +12,6 @@ import openpyxl
 import time
 import image
 import game_stat
-import bgg
 import gegle
 import config
 
@@ -28,7 +27,7 @@ async def on_ready():
     print(client.user.id)
     print("-------------------------")
     await client.change_presence(game=discord.Game(name='디스코드 봇', type='1'))
-    # client.loop.create_task(dogdrip_post())
+    client.loop.create_task(dogdrip_post())
 
 @commands.has_role(name="전과자")
 async def on_message(message):
@@ -481,4 +480,4 @@ async def dogdrip_post():
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-client.run(config.TOKEN1)
+client.run(config.TOKEN)
