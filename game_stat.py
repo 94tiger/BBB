@@ -166,17 +166,126 @@ def get_lol_stat(lolid):
     URL = ("https://www.op.gg/summoner/userName=" + lolid)
     html = get_ihtml(URL)
     soup = BeautifulSoup(html, 'html.parser')
+    stat = []
+
+    # # 최근 전적(게임타입, 승패)
+    # entries = soup.find_all('div', {'class': 'GameItemWrap'})
+    #
+    # recent_entries = []
+    # for i in range(5):
+    #     line = []
+    #
+    #     entry = entries[i]
+    #
+    #     recent_game_type = entry.find('div', {'class': 'GameType'})
+    #     recent_game_type = re.sub(pattern, '', recent_game_type.text)
+    #     recent_game_result = entry.find('div', {'class': 'GameResult'})
+    #     recent_game_result = re.sub(pattern, '', recent_game_result.text)
+    #
+    #     line.append(recent_game_type)
+    #     line.append(recent_game_result)
+    #
+    #     recent_entries.append(line)
+    #     print(line)
+    # stat.append(recent_entries)
+
+    # 최근 전적(게임타입, 승패)
+    entries = soup.find_all('div', {'class': 'GameItemWrap'})
+
+    recent_entries = []
+    # 밑의 range의 변수로 가져올 전적 갯수 설정 (embed에 썸네일 추가시 5개 이상은 넘어감)
+    for i in range(5):
+        line = []
+
+        entry = entries[i]
+
+        recent_game_type = entry.find('div', {'class': 'GameType'})
+        recent_game_type = re.sub(pattern, '', recent_game_type.text)
+        recent_game_result = entry.find('div', {'class': 'GameResult'})
+        recent_game_result = re.sub(pattern, '', recent_game_result.text)
+        # 게임 타입 옵션
+        if recent_game_type == "일반":
+            recent_game_type = "Normal"
+        elif recent_game_type == "솔랭":
+            recent_game_type = " SoloR"
+        elif recent_game_type == "자유5:5랭크":
+            recent_game_type = " TeamR"
+        elif recent_game_type == "무작위총력전":
+            recent_game_type = " ARAM "
+        elif recent_game_type == "Bot":
+            recent_game_type = "  Bot "
+        elif recent_game_type == "우르프":
+            recent_game_type = "  Urf "
+        else:
+            recent_game_type = "   ?  "
+        # 게임 결과 옵션
+        if recent_game_result == "승리":
+            recent_game_result = " 'Win'"
+        elif recent_game_result == "패배":
+            recent_game_result = " Lose "
+        elif recent_game_result == "다시하기":
+            recent_game_result = "replay"
+        else:
+            recent_game_result = "   ?  "
+
+        line.append(recent_game_type)
+        line.append(recent_game_result)
+
+        recent_entries.append(line)
+
+    text_table_top_start = "┏"
+    text_table_top = "━━━━━━┳"
+    text_table_top_end = "━━━━━━┓\n"
+
+    text_table_middle_start = "┣"
+    text_table_middle = "━━━━━━╋"
+    text_table_middle_end = "━━━━━━┫\n"
+
+    text_table_bottom_start = "┗"
+    text_table_bottom = "━━━━━━┻"
+    text_table_bottom_end = "━━━━━━┛"
+
+    text_teble_wall = "┃"
+
+    col_len = len(recent_entries)
+    row_len = len(recent_entries[0])
+
+    recent_ent = "```prolog\n"
+
+    recent_ent = recent_ent + text_table_top_start
+    for i in range(col_len-1):
+        recent_ent = recent_ent + text_table_top
+    recent_ent = recent_ent + text_table_top_end
+
+    for j in range(row_len):
+        recent_ent = recent_ent + text_teble_wall
+        for i in range(col_len):
+            recent_ent = recent_ent + recent_entries[i][j] + text_teble_wall
+        recent_ent = recent_ent + "\n"
+
+        if j != row_len-1:
+            recent_ent = recent_ent + text_table_middle_start
+            for i in range(col_len - 1):
+                recent_ent = recent_ent + text_table_middle
+            recent_ent = recent_ent + text_table_middle_end
+
+    recent_ent = recent_ent + text_table_bottom_start
+    for i in range(col_len - 1):
+        recent_ent = recent_ent + text_table_bottom
+    recent_ent = recent_ent + text_table_bottom_end + "```"
+
+    # recent_entry = "```prolog\n┏━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┓\n┃" + recent_entries[0][0] + "┃" + recent_entries[1][0] + "┃" + recent_entries[2][0] + "┃" + recent_entries[3][0] + "┃" + recent_entries[4][0] + "┃\n┣━━━━━━╋━━━━━━╋━━━━━━╋━━━━━━╋━━━━━━┫\n┃" + recent_entries[0][1] + "┃" + recent_entries[1][1] + "┃" + recent_entries[2][1] + "┃" + recent_entries[3][1] + "┃" + recent_entries[4][1] + "┃\n┗━━━━━━┻━━━━━━┻━━━━━━┻━━━━━━┻━━━━━━┛```"
+    stat.append(recent_ent)
     """
     op.gg 구조
     SummonerRatingMedium > TierRankInfo > RankType, TierRank, TierInfo > LeaguePoints, WinLose > wins, losses, winratio 
     
-    :returns : stat = [rank_available, profile_image, tier_icon, rank_type, tier_rank, league_points, wins, losses, winratio]
-    :returns : stat = [랭크유무, 프로필이미지링크, 티어아이콘링크, 랭크타입, 현재티어, 점수, 승, 패, 승률]
+    :returns : stat = [recent_ent, rank_available, profile_image, tier_icon, rank_type, tier_rank, league_points, wins, losses, winratio]
+    :returns : stat = [최근전적[게임타입, 승패], 랭크유무, 프로필이미지링크, 티어아이콘링크, 랭크타입, 현재티어, 점수, 승, 패, 승률]
     """
     profile_image = soup.find('img', {'class': 'ProfileImage'})
     profile_image = profile_image.get('src')
     profile_image = "http:" + profile_image
-
 
     solo_tier_info = soup.find('div', {'class': 'SummonerRatingMedium'})
     tier_rank_info = solo_tier_info.find('div', {'class': 'TierRankInfo'})
@@ -200,10 +309,24 @@ def get_lol_stat(lolid):
         losses = tier_info.find('span', {'class': 'losses'}).text
         winratio = tier_info.find('span', {'class': 'winratio'}).text
 
-        stat = [rank_available, profile_image, tier_icon, rank_type, tier_rank, league_points, wins, losses, winratio]
+        stat.append(rank_available)
+        stat.append(profile_image)
+        stat.append(tier_icon)
+        stat.append(rank_type)
+        stat.append(tier_rank)
+        stat.append(league_points)
+        stat.append(wins)
+        stat.append(losses)
+        stat.append(winratio)
+
+        # = [rank_available, profile_image, tier_icon, rank_type, tier_rank, league_points, wins, losses, winratio]
     else:
         rank_available = False
 
         tier_icon = "http://opgg-static.akamaized.net/images/medals/default.png"
-        stat = [rank_available, profile_image, tier_icon]
+
+        stat.append(rank_available)
+        stat.append(profile_image)
+        stat.append(tier_icon)
+
     return stat

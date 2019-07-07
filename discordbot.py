@@ -143,14 +143,16 @@ async def on_message(message):
         stat = game_stat.get_lol_stat(lolid)
         # stat = [랭크유무, 프로필이미지링크, 티어아이콘링크, 랭크타입, 현재티어, 점수, 승, 패, 승률]
         embed_stat = discord.Embed(color=0xdc6363, timestamp=now)
-        embed_stat.set_author(name=lolid, url="https://www.op.gg/summoner/userName=" + lolid, icon_url=stat[1])
+        embed_stat.set_author(name=lolid, url="https://www.op.gg/summoner/userName=" + lolid, icon_url=stat[2])
         embed_stat.set_footer(text="from OP.GG", icon_url="https://pbs.twimg.com/profile_images/928183232096432128/_rMzMIU4_400x400.jpg")
         # 대체 이미지 https://opgg-static.akamaized.net/images/site/about/img-logo-opgg.png
-        embed_stat.set_thumbnail(url=stat[2])
-        if stat[0] == True:
-            embed_stat.add_field(name=stat[3] + " " + stat[4], value="**" + stat[5] + "** / `" + stat[6] + "` `"+ stat[7] + "` / `"+ stat[8] + "`")
+        embed_stat.set_thumbnail(url=stat[3])
+        if stat[1] == True:
+            embed_stat.add_field(name=stat[4] + " " + stat[5], value="**" + stat[6] + "** / `" + stat[7] + "` `"+ stat[8] + "` / `"+ stat[9] + "`")
         else:
             embed_stat.add_field(name="Unranked", value="랭크 전적이 존재하지 않는 유저입니다.")
+
+        embed_stat.add_field(name="최근전적", value=stat[0])
         # embed_stat.add_field(name="Most 1", value="```\n트위스티드 페이트\t|3.54\t|50%\t|337게임```")
         await client.send_message(message.channel, content="`" + lolid + "`님의 전적", embed=embed_stat)
 
