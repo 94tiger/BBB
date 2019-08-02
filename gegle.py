@@ -17,6 +17,7 @@ def get_html(url):
         _html = resp.text
     return _html
 
+
 def get_gegle(gallery):
     """
     :param gallery : 갤러리 str ex)야구갤러리 baseball_new8
@@ -59,6 +60,7 @@ def get_gegle(gallery):
     print(gegle)
     return gegle
 
+
 def get_mgegle(gallery):
     URL = ("https://gall.dcinside.com/mgallery/board/lists?id=" + str(gallery) + "&exception_mode=recommend")
 
@@ -91,6 +93,7 @@ def get_mgegle(gallery):
         i += 1
     return gegle
 
+
 def get_dogdrip():
     URL = ("https://www.dogdrip.net/dogdrip")
     # URL = "https://gall.dcinside.com/board/lists?id=baseball_new7&exception_mode=recommend"
@@ -122,6 +125,7 @@ def get_dogdrip():
     return dogdrip
 
     # URL = "https://gall.dcinside.com/board/lists?id=baseball_new7&exception_mode=recommend"
+
 
 def get_dogdrip_post():
     URL = "https://www.dogdrip.net/dogdrip"

@@ -27,7 +27,7 @@ async def on_ready():
     print(client.user.id)
     print("-------------------------")
     await client.change_presence(game=discord.Game(name='디스코드 봇', type='1'))
-    client.loop.create_task(dogdrip_post())
+    # client.loop.create_task(dogdrip_post())
 
 @commands.has_role(name="전과자")
 async def on_message(message):
@@ -35,6 +35,7 @@ async def on_message(message):
 
 @client.event
 async def on_message(message):
+    prefix = '$'
     if message.author.bot:
         return
 
@@ -106,7 +107,7 @@ async def on_message(message):
         else:
             await client.send_message(message.channel, "`" + pubgid + "`님의 ID가 존재하지 않습니다.")
 
-    if message.content.startswith("$배그"):
+    if message.content.startswith(prefix + "배그"):
         stat_str = message.content.split(" ")
         pubgid = stat_str[1]
         pubgmode = stat_str[2]
@@ -137,7 +138,7 @@ async def on_message(message):
             pubgmode = pubgmode.replace("1", "1인칭 ")
             await client.send_file(message.channel, fp='./stat/' + pubgid + '_' + pubgmode_str + '_fpp.png' ,content="`" + pubgid + "`님의 **" + pubgmode + "** 전적입니다.")
 
-    if message.content.startswith("$롤"):
+    if message.content.startswith(prefix + "롤"):
         stat_str = message.content.split(" ")
         lolid = stat_str[1]
         stat = game_stat.get_lol_stat(lolid)
@@ -156,7 +157,7 @@ async def on_message(message):
         # embed_stat.add_field(name="Most 1", value="```\n트위스티드 페이트\t|3.54\t|50%\t|337게임```")
         await client.send_message(message.channel, content="`" + lolid + "`님의 전적", embed=embed_stat)
 
-    if message.content.startswith("$념글"):
+    if message.content.startswith(prefix + "념글"):
         gegle_str = message.content.split(" ")
         gallery_name = gegle_str[1]
         if gallery_name == "힛갤":
@@ -180,7 +181,7 @@ async def on_message(message):
         embed_gegl.add_field(name=gallery_name + " 개념글", value=gegl_value, inline=False)
         await client.send_message(message.channel, embed=embed_gegl)
 
-    if message.content.startswith("$최신개드립"):
+    if message.content.startswith(prefix + "개드립"):
         dogdrip_channel = client.get_channel('573904343703748638')
 
         async for m in client.logs_from(dogdrip_channel, limit=1):
@@ -193,7 +194,7 @@ async def on_message(message):
         embed_dogdrip.set_image(url=m.attachments[0]['proxy_url'])
         await client.send_message(message.channel, embed=embed_dogdrip)
 
-    if message.content.startswith("$개드립"):
+    if message.content.startswith(prefix + "개드립_"):
         dogdrip = gegle.get_dogdrip()
 
         dogdrip_value = ""
@@ -204,29 +205,29 @@ async def on_message(message):
 
         await client.send_message(message.channel, embed=embed_dogdrip)
 
-    if message.content.startswith('$명령어'):
+    if message.content.startswith(prefix + '명령어'):
         command_msg = "```md\n# 기본\n* $명령어 - 봇 명령어 안내\n* $주사위 [굴릴 주사위]\n# 선택 \n* $골라 [1 2 3 ...] - 1,2,3랜덤 선택\n* $뭐먹지 - 메뉴 랜덤 \n* $치킨뭐먹지 - 치킨 랜덤\n* $뭔겜할까 - 게임 랜덤 \n* $맵 - 맵 랜덤\n# 기능 \n* $전적 [배그아이디] [솔로|듀오|스쿼드|1솔로|1듀오|1스쿼드] - 배그 전적 검색 (dak.gg 기준 / 갱신 x)\n* $배그 [배그아이디] [솔로|듀오|스쿼드] - 배그 전적 검색 (pubg.op.gg 기준 / 갱신 ok)\n* $롤 [롤아이디] - 롤 전적 검색 (op.gg 기준 / 갱신 x)\n# 커뮤니티\n* $념글 [힛갤|야갤|중갤|롤갤|돌갤|이슈줌] - 최신 개념글 목록\n* $개드립 - 최신 개드립 목록 \n# 서버 \n* $해제 - 지옥 탈출```"
         await client.send_message(message.author, command_msg)
 
-    if message.content.startswith('$서버'):
+    if message.content.startswith(prefix + '$서버'):
         server_list = []
         for server in client.servers:
             server_list.append(server.name)
         await client.send_message(message.channel, "\n".join(server_list))
 
-    if message.content.startswith('$주사위'):
+    if message.content.startswith(prefix + '주사위'):
         roll = message.content.split(" ")
         dice = random.randint(1, int(roll[1]))
         await client.send_message(message.channel, ":game_die: 나온 눈은 " + str(dice))
 
-    if message.content.startswith('$골라'):
+    if message.content.startswith(prefix + '골라'):
         choice = message.content.split(" ")
         choiceNum = random.randint(1, len(choice) - 1)
         choiceResult = choice[choiceNum]
         await client.send_message(message.channel,
                                   "`" + message.author.display_name + "`님의 선택은 __**" + choiceResult + "**__ 입니다.")
 
-    if message.content.startswith('$뭐먹지'):
+    if message.content.startswith(prefix + '뭐먹지'):
         # category = "중식, 일식, 분식, 치킨, 피자, 햄버거"
         food = "피자 햄버거 치킨 라면 백반 돈까스 제육 우동 김치찌개 된장찌개 순두부찌개 부대찌개 육개장 쫄면 콩국수 냉면 김밥 메밀소바 짜장면 짬뽕 볶음밥 짬뽕밥 오므라이스 잡채밥 삼겹살 곱창 족발 보쌈 찜닭 회 떡볶이 비빔밥 설렁탕 순대국 굶어"
         foodChoice = food.split(" ")
@@ -234,7 +235,7 @@ async def on_message(message):
         foodResult = foodChoice[foodNum]
         await client.send_message(message.channel, foodResult)
 
-    if message.content.startswith('$치킨뭐먹지'):
+    if message.content.startswith(prefix + '치킨뭐먹지'):
         # category = "중식, 일식, 분식, 치킨, 피자, 햄버거"
         chicken = "굽네-오리지널 굽네-고추바사삭 네네-스노윙 교촌-레드콤보 교촌-허니콤보 BBQ-황금올리브 BBQ-자메이카통다리 BHC-핫후라이드 BHC-뿌링클 또래오래-갈릭반핫양념반 또래오래-엔젤치킨 처갓집-슈프림양념치킨 처갓집-와락치킨 멕시카나-김치킨 멕시카나-치토스치킨"
         chickenChoice = chicken.split(" ")
@@ -242,32 +243,32 @@ async def on_message(message):
         chickenResult = chickenChoice[chickenNum]
         await client.send_message(message.channel, chickenResult)
 
-    if message.content.startswith('$뭔겜할까'):
-        game = "배그 롤 하스 오버워치 메이플"
+    if message.content.startswith(prefix + '뭔겜할까'):
+        game = "배그 롤 롤토체스 하스 오버워치 메이플 문명5 "
         gameChoice = game.split(" ")
         gameNum = random.randint(0, len(gameChoice) - 1)
         gameResult = gameChoice[gameNum]
         await client.send_message(message.channel, gameResult)
 
-    if message.content.startswith('$맵'):
+    if message.content.startswith(prefix + '맵'):
         map = "에란겔 미라마 사녹 비켄디 빠른참가"
         mapChoice = map.split(" ")
         mapNum = random.randint(0, len(mapChoice) - 1)
         mapResult = mapChoice[mapNum]
         await client.send_message(message.channel, mapResult)
 
-    if message.content.startswith('$메모장쓰기'):
+    if message.content.startswith(prefix + '메모장쓰기'):
         file = open("디스코드봇메모장.txt", "w")
         file.write("안녕하세요")
         file.close()
 
-    if message.content.startswith('$메모장읽기'):
+    if message.content.startswith(prefix + '메모장읽기'):
         file = open("디스코드봇메모장.txt")
         await client.send_message(message.channel, file.read())
         file.close()
 
     #   $학습 A B
-    if message.content.startswith('$학습'):
+    if message.content.startswith(prefix + '학습'):
         file = openpyxl.load_workbook("기억.xlsx")
         sheet = file.active
         learn = message.content.split(" ")
@@ -280,7 +281,7 @@ async def on_message(message):
         file.save("기억.xlsx")
 
     #   $기억 A     => B
-    if message.content.startswith('$기억'):
+    if message.content.startswith(prefix + '기억'):
         file = openpyxl.load_workbook("기억.xlsx")
         sheet = file.active
         memory = message.content.split(" ")
@@ -289,8 +290,16 @@ async def on_message(message):
                 await client.send_message(message.channel, sheet["B" + str(i)].value)
                 break
 
-    if message.content.startswith('$확인'):
-        await client.send_message(message.channel, str(now.month) + str(now.day) + str(now.hour) + str(now.minute))
+    if message.content.startswith(prefix + '확인'):
+        embed_dogdrip1 = discord.Embed(title="1", color=0x1895a7)
+        embed_dogdrip1.set_image(url="https://d1v0ze4r2jabid.cloudfront.net/characters/Lulu.png")
+        embed_dogdrip2 = discord.Embed(title="2", color=0x1895a7)
+        embed_dogdrip2.set_image(url="https://d1v0ze4r2jabid.cloudfront.net/characters/Kassadin.png")
+        embed_dogdrip3 = discord.Embed(title="3", color=0x1895a7)
+        embed_dogdrip3.set_image(url="https://d1v0ze4r2jabid.cloudfront.net/characters/Tristana.png")
+        await client.send_message(message.channel, embed=embed_dogdrip)
+
+        # await client.send_message(message.channel, str(now.month) + str(now.day) + str(now.hour) + str(now.minute))
         # await  client.send_message(message.channel, "<@" + message.author.id + ">")
         # if "502065016393039873" in [role.id for role in message.author.roles]:
         #     await client.send_message(message.channel, "전과 있음")
@@ -358,7 +367,7 @@ async def on_message(message):
                     except discord.Forbidden:
                         await client.send_message(message.channel, "권한이 없음")
 
-        if message.content.startswith('$해제'):
+        if message.content.startswith(prefix + '해제'):
             split_name = message.author.display_name.split(" ")
             out_d_chk = split_name[1].split("일")
             out_h_chk = split_name[2].split("시")
@@ -524,4 +533,4 @@ async def dogdrip_post():
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-client.run(config.TOKEN)
+client.run(config.TOKEN1)

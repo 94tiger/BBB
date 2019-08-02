@@ -3,3 +3,5 @@ pytz
 openpyxl
 requests
 beautifulsoup4
+pymysql
+selenium

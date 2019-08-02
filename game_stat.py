@@ -8,14 +8,14 @@ import re
 
 pattern = re.compile((r'\s+'))
 
-def get_ihtml(url):
+def get_html(url):
     headers = {'Accept-Language': 'ko'}
-    _ihtml = ""
-    iresp = requests.get(url, headers = headers)
+    _html = ""
+    resp = requests.get(url, headers = headers)
     # status_code가 정상이면
-    if iresp.status_code == 200:
-        _ihtml = iresp.text
-    return _ihtml
+    if resp.status_code == 200:
+        _html = resp.text
+    return _html
 
 def get_pubg_stat(pubgid, pubgmode, tpp):
     """
@@ -24,9 +24,9 @@ def get_pubg_stat(pubgid, pubgmode, tpp):
     :return: stat [stat_KD, stat_AVD, stat_NoG, stat_PoV, avatar_img] [K/D, 평균딜, 게임수,
     """
     URL = ("https://dak.gg/profile/" + pubgid)
-    ihtml = get_ihtml(URL)
-    isoup = BeautifulSoup(ihtml, 'html.parser')
-    avatar = isoup.find('div', {'class' : 'userInfo'})
+    html = get_html(URL)
+    soup = BeautifulSoup(html, 'html.parser')
+    avatar = soup.find('div', {'class' : 'userInfo'})
 
     try:
         avatar = avatar.find('img')
@@ -41,7 +41,7 @@ def get_pubg_stat(pubgid, pubgmode, tpp):
         avatar = "https://dak.gg/images/icons/avatars/kakao-dakgg.jpg"
     avatar_img = str(avatar)
 
-    ielement = isoup.find('section', {'class': pubgmode})
+    ielement = soup.find('section', {'class': pubgmode})
     if tpp == True:
         ielement = ielement.find('div', {'class': 'mode-section tpp'})
     else:
@@ -191,7 +191,6 @@ def get_lol_stat(lolid):
 
     # 최근 전적(게임타입, 승패)
     entries = soup.find_all('div', {'class': 'GameItemWrap'})
-
     recent_entries = []
     # 밑의 range의 변수로 가져올 전적 갯수 설정 (embed에 썸네일 추가시 5개 이상은 넘어감)
     for i in range(5):
@@ -276,6 +275,7 @@ def get_lol_stat(lolid):
 
     # recent_entry = "```prolog\n┏━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┳━━━━━━┓\n┃" + recent_entries[0][0] + "┃" + recent_entries[1][0] + "┃" + recent_entries[2][0] + "┃" + recent_entries[3][0] + "┃" + recent_entries[4][0] + "┃\n┣━━━━━━╋━━━━━━╋━━━━━━╋━━━━━━╋━━━━━━┫\n┃" + recent_entries[0][1] + "┃" + recent_entries[1][1] + "┃" + recent_entries[2][1] + "┃" + recent_entries[3][1] + "┃" + recent_entries[4][1] + "┃\n┗━━━━━━┻━━━━━━┻━━━━━━┻━━━━━━┻━━━━━━┛```"
     stat.append(recent_ent)
+
     """
     op.gg 구조
     SummonerRatingMedium > TierRankInfo > RankType, TierRank, TierInfo > LeaguePoints, WinLose > wins, losses, winratio 
