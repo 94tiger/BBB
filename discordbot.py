@@ -20,18 +20,23 @@ client = discord.Client()
 
 # client = commands.Bot(command_prefix = '$')
 
+
 @client.event
 async def on_ready():
     print("login")
     print(client.user.name)
     print(client.user.id)
     print("-------------------------")
+    # game = discord.Game("$명령어")
+    # await client.change_presence(status=discord.Status.online, activity=game)
     await client.change_presence(game=discord.Game(name='디스코드 봇', type='1'))
-    # client.loop.create_task(dogdrip_post())
+    client.loop.create_task(dogdrip_post())
+
 
 @commands.has_role(name="전과자")
 async def on_message(message):
     return
+
 
 @client.event
 async def on_message(message):
@@ -445,54 +450,54 @@ def find_channel(server, refresh = False):
 
     return None
 
-@client.event
-async def on_voice_state_update(member_before, member_after):
-    """
-    서버에서 멤버의 음성 상태가 변경되면 호출됨.
-
-    :param member_before: The state of the member before the change.
-    멤버의 변화 전의 음성 상태
-    :param member_after: The state of the member after the change.
-    멤버의 변화 후의 음성 상태
-    """
-    server = member_after.server
-    channel = find_channel(server)
-
-    voice_channel_before = member_before.voice_channel
-    voice_channel_after = member_after.voice_channel
-
-    if voice_channel_before == voice_channel_after:
-        # 변경되지 않음
-        return
-
-    if voice_channel_before == None:
-        # 멤버가 상태 변경 전에 음성 채널에 접속해 있지 않았음
-        msg = "{} 님이 _{}_ 채널에 접속하였습니다.".format(member_after.mention, voice_channel_after.id)
-    else:
-        # 멤버가 상태 변경 전에 음성 채널에 접속해 있었음
-        if voice_channel_after == None:
-            # 멤버가 상태 변경 후에 음성 채널에 접속해 있지 않음
-            msg = "{} 님이 _{}_ 채널을 나갔습니다.".format(member_after.mention, voice_channel_before.id)
-        else:
-            # 멤버가 상태 변경 후에 계속해서 음성 채널에 접속해 있음
-            msg = "{} 님이 _{}_ 채널에서 _{}_ 채널로 옮겼습니다.".format(member_after.mention, voice_channel_before.id, voice_channel_after.id)
-
-    # 채널에 음성 이벤트를 기록
-    try:
-        await client.send_message(channel, msg)
-    except:
-        # 채널에 메시지를 보낼 수 없습니다. 강제로 채널 캐시를 새로 고친 후 다시 시도하십시오.
-        channel = find_channel(server, refresh = True)
-        if channel == None:
-            # 채널을 찾을 수 없습니다.
-            print("Error: {}서버에 #{} 채널이 존재하지 않습니다.".format(server, config.VOICE_LOG_CHANNEL))
-        else:
-            # 메시지를 다시 보내십시오
-            try:
-                await client.send_message(channel, msg)
-            except discord.DiscordException as exception:
-                # 예외를 출력함
-                print("Error: {} 서버의 #{} 채널에 보낼 수 있는 메시지가 없습니다. 예외: {}".format(server, config.VOICE_LOG_CHANNEL, exception))
+# @client.event
+# async def on_voice_state_update(member_before, member_after):
+#     """
+#     서버에서 멤버의 음성 상태가 변경되면 호출됨.
+#
+#     :param member_before: The state of the member before the change.
+#     멤버의 변화 전의 음성 상태
+#     :param member_after: The state of the member after the change.
+#     멤버의 변화 후의 음성 상태
+#     """
+#     server = member_after.server
+#     channel = find_channel(server)
+#
+#     voice_channel_before = member_before.voice_channel
+#     voice_channel_after = member_after.voice_channel
+#
+#     if voice_channel_before == voice_channel_after:
+#         # 변경되지 않음
+#         return
+#
+#     if voice_channel_before == None:
+#         # 멤버가 상태 변경 전에 음성 채널에 접속해 있지 않았음
+#         msg = "{} 님이 _{}_ 채널에 접속하였습니다.".format(member_after.mention, voice_channel_after.id)
+#     else:
+#         # 멤버가 상태 변경 전에 음성 채널에 접속해 있었음
+#         if voice_channel_after == None:
+#             # 멤버가 상태 변경 후에 음성 채널에 접속해 있지 않음
+#             msg = "{} 님이 _{}_ 채널을 나갔습니다.".format(member_after.mention, voice_channel_before.id)
+#         else:
+#             # 멤버가 상태 변경 후에 계속해서 음성 채널에 접속해 있음
+#             msg = "{} 님이 _{}_ 채널에서 _{}_ 채널로 옮겼습니다.".format(member_after.mention, voice_channel_before.id, voice_channel_after.id)
+#
+#     # 채널에 음성 이벤트를 기록
+#     try:
+#         await client.send_message(channel, msg)
+#     except:
+#         # 채널에 메시지를 보낼 수 없습니다. 강제로 채널 캐시를 새로 고친 후 다시 시도하십시오.
+#         channel = find_channel(server, refresh = True)
+#         if channel == None:
+#             # 채널을 찾을 수 없습니다.
+#             print("Error: {}서버에 #{} 채널이 존재하지 않습니다.".format(server, config.VOICE_LOG_CHANNEL))
+#         else:
+#             # 메시지를 다시 보내십시오
+#             try:
+#                 await client.send_message(channel, msg)
+#             except discord.DiscordException as exception:
+#                 # 예외를 출력함
+#                 print("Error: {} 서버의 #{} 채널에 보낼 수 있는 메시지가 없습니다. 예외: {}".format(server, config.VOICE_LOG_CHANNEL, exception))
 
 async def dogdrip_post():
     while True:
@@ -533,4 +538,4 @@ async def dogdrip_post():
 # if author.id == '':
 #    await client.send_message(message.channel, "")
 
-client.run(config.TOKEN1)
+client.run(config.TOKEN)
